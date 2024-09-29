@@ -77,3 +77,12 @@ body {
   border-radius: 5px;
   background-color: #e0e0e0;
 }
+
+#infoDesc{
+  width: 850px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  word-wrap: break-word;
+  overflow: auto;
+}
