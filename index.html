@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <title>Connect Letters v2</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -9,124 +9,148 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="headerBox"><h1 id="mainTitle">Connect Letters!</h1></div>
     <div id="displayBox">
-        <h1 id="displayText">Loading...</h1>
+      <h1 id="displayText">Loading...</h1>
     </div>
 
     <!-- Input form section -->
-    <form id="inputForm" style="display:none;" autocomplete="off">
-        <input type="text" id="inputBox" name="inputBox" maxlength="1" required>
-        <button type="submit" id="submitButton">Submit</button>
+    <form id="inputForm" style="display: none" autocomplete="off">
+      <input type="text" id="inputBox" name="inputBox" maxlength="1" required />
+      <button type="submit" id="submitButton">Submit</button>
     </form>
 
     <!-- Timer box -->
-    <div id="timerBox" style="display:none;"></div>
+    <div id="timerBox" style="display: none"></div>
 
     <script>
-        // Constants
-        const COOLDOWN_PERIOD = 15 * 1000;
+      // Constants
+      const COOLDOWN_PERIOD = 15 * 1000;
 
-        // Fetch the current displayText from your server endpoint when the page loads
-        async function fetchDisplayText() {
-            try {
-                const response = await fetch('https://connectlettersbackend.onrender.com/api/displayText'); // Fetch from your server
+      // Fetch the current displayText from your server endpoint when the page loads
+      async function fetchDisplayText() {
+        try {
+          const response = await fetch(
+            "https://connectlettersbackend.onrender.com/api/displayText"
+          ); // Fetch from your server
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
+          if (!response.ok) {
+            throw new Error(
+              "Network response was not ok " + response.statusText
+            );
+          }
 
-                const data = await response.json();
-                document.getElementById('displayText').textContent = data.displayText; // Set the text content
-            } catch (error) {
-                console.error('Error fetching displayText:', error);
-            }
+          const data = await response.json();
+          document.getElementById("displayText").textContent = data.displayText; // Set the text content
+        } catch (error) {
+          console.error("Error fetching displayText:", error);
+        }
+      }
+
+      // Fetch the current displayText on page load
+      fetchDisplayText();
+
+      // Check if user is on cooldown
+      function checkCooldown() {
+        const lastSubmitTime = localStorage.getItem("lastSubmitTime");
+        const currentTime = Date.now();
+
+        if (lastSubmitTime && currentTime - lastSubmitTime < COOLDOWN_PERIOD) {
+          const remainingTime =
+            COOLDOWN_PERIOD - (currentTime - lastSubmitTime);
+          startTimer(remainingTime);
+        } else {
+          showInputForm();
+        }
+      }
+
+      // Show the input form
+      function showInputForm() {
+        document.getElementById("inputForm").style.display = "flex";
+        document.getElementById("timerBox").style.display = "none";
+      }
+
+      // Start the countdown timer
+      function startTimer(duration) {
+        document.getElementById("inputForm").style.display = "none";
+        const timerBox = document.getElementById("timerBox");
+        timerBox.style.display = "flex";
+
+        let remainingTime = duration;
+
+        function updateTimer() {
+          const hours = Math.floor(
+            (remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+          timerBox.textContent = `You can submit another character in: ${hours}h ${minutes}m ${seconds}s`;
+
+          if (remainingTime <= 0) {
+            clearInterval(timerInterval);
+            showInputForm();
+          } else {
+            remainingTime -= 1000;
+          }
         }
 
-        // Fetch the current displayText on page load
-        fetchDisplayText();
+        updateTimer();
+        const timerInterval = setInterval(updateTimer, 1000);
+      }
 
-        // Check if user is on cooldown
-        function checkCooldown() {
-            const lastSubmitTime = localStorage.getItem('lastSubmitTime');
-            const currentTime = Date.now();
+      // Handle form submission
+      document
+        .getElementById("inputForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const inputValue = document.getElementById("inputBox").value;
 
-            if (lastSubmitTime && currentTime - lastSubmitTime < COOLDOWN_PERIOD) {
-                const remainingTime = COOLDOWN_PERIOD - (currentTime - lastSubmitTime);
-                startTimer(remainingTime);
+          try {
+            const response = await fetch(
+              "https://connectlettersbackend.onrender.com/submit",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ input: inputValue }),
+              }
+            );
+
+            if (response.ok) {
+              // Update the displayText with the new character
+              document.getElementById("displayText").textContent += inputValue;
+              document.getElementById("inputBox").value = ""; // Clear the input box
+
+              // Store the current time as the last submission time
+              localStorage.setItem("lastSubmitTime", Date.now());
+              startTimer(COOLDOWN_PERIOD);
             } else {
-                showInputForm();
+              alert("Error: Only one character is allowed");
             }
-        }
-
-        // Show the input form
-        function showInputForm() {
-            document.getElementById('inputForm').style.display = 'flex';
-            document.getElementById('timerBox').style.display = 'none';
-        }
-
-        // Start the countdown timer
-        function startTimer(duration) {
-            document.getElementById('inputForm').style.display = 'none';
-            const timerBox = document.getElementById('timerBox');
-            timerBox.style.display = 'flex';
-
-            let remainingTime = duration;
-
-            function updateTimer() {
-                const hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-
-                timerBox.textContent = `You can submit another character in: ${hours}h ${minutes}m ${seconds}s`;
-
-                if (remainingTime <= 0) {
-                    clearInterval(timerInterval);
-                    showInputForm();
-                } else {
-                    remainingTime -= 1000;
-                }
-            }
-
-            updateTimer();
-            const timerInterval = setInterval(updateTimer, 1000);
-        }
-
-        // Handle form submission
-        document.getElementById('inputForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const inputValue = document.getElementById('inputBox').value;
-
-            try {
-                const response = await fetch('https://connectlettersbackend.onrender.com/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ input: inputValue }),
-                });
-
-                if (response.ok) {
-                    // Update the displayText with the new character
-                    document.getElementById('displayText').textContent += inputValue;
-                    document.getElementById('inputBox').value = ''; // Clear the input box
-                    
-                    // Store the current time as the last submission time
-                    localStorage.setItem('lastSubmitTime', Date.now());
-                    startTimer(COOLDOWN_PERIOD);
-                } else {
-                    alert('Error: Only one character is allowed');
-                }
-            } catch (error) {
-                console.error('Error sending data:', error);
-            }
+          } catch (error) {
+            console.error("Error sending data:", error);
+          }
         });
 
-        // Check the cooldown when the page loads
-        checkCooldown();
+      // Check the cooldown when the page loads
+      checkCooldown();
     </script>
-</body>
+
+    <br />
+    <br />
+    <h1 id="moreInfo">More Info:</h1>
+    <h2 id="infoDesc">
+      So this project is inspired by Rebane2001's "letters" social experiment.
+      It's my first time doing something like this so yeah. Also, I am aware
+      there are a few bugs which I'll probably fix when I have time ig.
+    </h2>
+    <h3>oh and hope i didnt leak my api keys :skull:</h3>
+  </body>
 </html>
