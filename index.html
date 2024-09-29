@@ -33,7 +33,7 @@
         // Fetch the current displayText from your server endpoint when the page loads
         async function fetchDisplayText() {
             try {
-                const response = await fetch('/api/displayText'); // Fetch from your server
+                const response = await fetch('https://connectlettersbackend.onrender.com/api/displayText'); // Fetch from your server
 
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
