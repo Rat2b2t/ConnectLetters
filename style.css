@@ -1,88 +1,156 @@
+/* General Body Styling */
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  min-height: 100vh;
   margin: 0;
-  background-color: #f0f0f0;
-  font-family: 'Noto Sans', sans-serif;
+  padding: 0;
+  background-color: #23262e;
+  font-family: 'Noto Sans Mono', monospace, sans-serif;
+  color: #fff;
 }
 
+/* Header Styling */
 #headerBox {
-  height: 50px;
-  padding-top: 10px;
-  border-bottom: 1px solid gray;
-  max-width: 370px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 10px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 #mainTitle {
-  font-size: 30px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  font-weight: 650;
-  letter-spacing: 6px;
-  color: rgb(0, 0, 0);
-  text-align: center;
-  padding: 0;
+  font-size: 2.5rem;
+  color: #4a90e5;
+  text-decoration: underline 2px solid #4a90e5;
   margin: 0;
+  transition: color 0.3s ease;
 }
 
+#mainTitle:hover {
+  color: #72b2f6;
+}
+
+/* Display Box Styling */
 #displayBox {
-  height: 500px;
-  width: 850px;
-  border: 1px solid gray;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  word-wrap: break-word;
+  display: flex;
+  align-items: flex-start; /* Align text at the top */
+  justify-content: center;
+  height: 400px; /* Fixed height */
+  width: 850px; /* Fixed width */
+  border: 2px solid #4a90e5;
+  border-radius: 10px;
+  background-color: #2a2f38;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
   overflow: auto;
+  transition: box-shadow 0.3s ease;
+  text-align: center;
 }
-
 
 #displayText {
-  font-family: Noto Sans;
-  font-size: 20px;
-  color: rgb(46, 46, 46);
-  padding: 0;
-  margin: 0;
+  font-size: 1.5rem;
+  color: #62717d;
+  word-wrap: break-word;
 }
 
-#inputForm, #timerBox {
+
+/* Input Form Styling */
+#inputForm {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  margin-top: 20px;
 }
+
 #inputBox {
-  margin-top: 10px;
   width: 50px;
   height: 50px;
-  text-align: center;
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-#submitButton {
-  padding: 5px 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-#timerBox {
-  margin-top: 5px;
-  font-size: 18px;
-  padding: 10px;
-  border: 1px solid #ccc;
+  border: 2px solid #4a90e5;
   border-radius: 5px;
-  background-color: #e0e0e0;
+  background-color: #2a2f38;
+  color: #fff;
+  text-align: center;
+  font-size: 2rem;
+  margin-right: 10px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-#infoDesc{
-  width: 850px;
+#inputBox:focus {
+  border-color: #72b2f6;
+  outline: none;
+  box-shadow: 0 0 5px #4a90e5;
+}
+
+#submitButton {
+  padding: 10px 20px;
+  border: 2px solid #4a90e5;
+  background-color: #4a90e5;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#submitButton:hover {
+  background-color: #72b2f6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Timer Box Styling */
+#timerBox {
+  font-size: 1.5rem;
+  margin-top: 20px;
+}
+
+/* More Info Section */
+#moreInfo {
+  margin-top: 30px;
   text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  word-wrap: break-word;
-  overflow: auto;
+}
+
+#infoDesc {
+  text-align: center;
+  color: #a0a4a8;
+}
+
+/* Submit Message Box Styling */
+#submitMessageBox {
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  height: 60px; /* Fixed height for the message box */
+  width: 300px; /* Fixed width for the message box */
+  border: 2px solid #4a90e5; /* Same border as display box */
+  border-radius: 10px; /* Same border radius */
+  background-color: #2a2f38; /* Same background color */
+  color: #62717d; /* Text color */
+  margin: 20px auto; /* Center horizontally with margin */
+  padding: 10px; /* Padding for the message */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Shadow */
+}
+
+#submitMessageText {
+  font-size: 1.2rem; /* Adjust font size */
+  text-align: center; /* Center text */
+}
+
+
+/* Timer Box Styling */
+#timerBox {
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  height: 50px; /* Fixed height */
+  width: 460px; /* Fixed width */
+  border: 2px solid #4a90e5;
+  border-radius: 10px;
+  background-color: #3b3e45; /* Darker background for contrast */
+  color: #ffffff; /* White text color */
+  font-size: 1.2rem; /* Adjust font size as needed */
+  padding: 10px; /* Add padding for spacing */
+  margin: 20px auto; /* Center the box */
+  transition: box-shadow 0.3s ease;
 }
