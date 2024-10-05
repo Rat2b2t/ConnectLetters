@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Connect Letters v2</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Connect letters to form a collaborative word or sentence. Inspired by Rebane2001's experiment." />
+    <title>Connect Letters v3</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,19 +15,36 @@
   </head>
 
   <body>
-    <div id="headerBox"><h1 id="mainTitle">Connect Letters!</h1></div>
-    <div id="displayBox">
-      <h1 id="displayText">Loading...</h1>
-    </div>
+    <header>
+      <div id="headerBox">
+        <h1 id="mainTitle">Connect Letters!</h1>
+      </div>
+    </header>
 
-    <!-- Input form section -->
-    <form id="inputForm" style="display: none" autocomplete="off">
-      <input type="text" id="inputBox" name="inputBox" maxlength="1" required />
-      <button type="submit" id="submitButton">Submit</button>
-    </form>
+    <main>
+      <section id="displayBox">
+        <h1 id="displayText">Loading...</h1>
+      </section>
 
-    <!-- Timer box -->
-    <div id="timerBox" style="display: none"></div>
+      <section>
+        <!-- Input form section -->
+        <form id="inputForm" style="display: none" autocomplete="off" aria-label="Letter input form">
+          <input
+            type="text"
+            id="inputBox"
+            name="inputBox"
+            maxlength="1"
+            required
+            aria-label="Input letter"
+            autofocus
+          />
+          <button type="submit" id="submitButton">Submit</button>
+        </form>
+      </section>
+
+      <!-- Timer box -->
+      <div id="timerBox" style="display: none" aria-live="polite"></div>
+    </main>
 
     <script>
       // Constants
@@ -44,8 +64,10 @@
           }
 
           const data = await response.json();
-          document.getElementById("displayText").textContent = data.displayText; // Set the text content
+          document.getElementById("displayText").textContent = data.displayText;
         } catch (error) {
+          document.getElementById("displayText").textContent =
+            "Failed to load. Please try again.";
           console.error("Error fetching displayText:", error);
         }
       }
@@ -82,15 +104,10 @@
         let remainingTime = duration;
 
         function updateTimer() {
-          const hours = Math.floor(
-            (remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-          );
-          const minutes = Math.floor(
-            (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
-          );
+          const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
 
-          timerBox.textContent = `You can submit another character in: ${hours}h ${minutes}m ${seconds}s`;
+          timerBox.textContent = `You can submit another character in: ${minutes}m ${seconds}s`;
 
           if (remainingTime <= 0) {
             clearInterval(timerInterval);
@@ -104,53 +121,49 @@
         const timerInterval = setInterval(updateTimer, 1000);
       }
 
-      // Handle form submission
-      document
-        .getElementById("inputForm")
-        .addEventListener("submit", async (event) => {
-          event.preventDefault();
-          const inputValue = document.getElementById("inputBox").value;
+      document.getElementById("inputForm").addEventListener("submit", async (event) => {
+  event.preventDefault(); // Prevent the default form behavior
+  const inputValue = document.getElementById("inputBox").value; // Get the input value without trimming
 
-          try {
-            const response = await fetch(
-              "https://connectlettersbackend.onrender.com/submit",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ input: inputValue }),
-              }
-            );
+  // Check if the input is either a single character or a single space
+  if (inputValue.length !== 1) {
+    alert("Please enter exactly one valid character or space");
+    return;
+  }
 
-            if (response.ok) {
-              // Update the displayText with the new character
-              document.getElementById("displayText").textContent += inputValue;
-              document.getElementById("inputBox").value = ""; // Clear the input box
+  try {
+    const response = await fetch(
+      "https://connectlettersbackend.onrender.com/submit",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ input: inputValue }),
+      }
+    );
 
-              // Store the current time as the last submission time
-              localStorage.setItem("lastSubmitTime", Date.now());
-              startTimer(COOLDOWN_PERIOD);
-            } else {
-              alert("Error: Only one character is allowed");
-            }
-          } catch (error) {
-            console.error("Error sending data:", error);
-          }
-        });
+    if (response.ok) {
+      // Update the displayText with the new character or space
+      document.getElementById("displayText").textContent += inputValue;
+
+      // Clear the input box after submission
+      document.getElementById("inputBox").value = ""; // Ensure input is cleared here
+
+      // Store the current time as the last submission time
+      localStorage.setItem("lastSubmitTime", Date.now());
+      startTimer(COOLDOWN_PERIOD);
+    } else {
+      alert("Error: Only one character is allowed");
+    }
+  } catch (error) {
+    console.error("Error sending data:", error);
+  }
+});
+
 
       // Check the cooldown when the page loads
       checkCooldown();
     </script>
-
-    <br />
-    <br />
-    <h1 id="moreInfo">More Info:</h1>
-    <h2 id="infoDesc">
-      So this project is inspired by Rebane2001's "letters" social experiment.
-      It's my first time doing something like this so yeah. Also, I am aware
-      there are a few bugs which I'll probably fix when I have time ig.
-    </h2>
-    <h3>oh and hope i didnt leak my api keys :skull:</h3>
   </body>
 </html>
